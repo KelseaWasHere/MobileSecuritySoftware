@@ -99,9 +99,10 @@ public class App extends Application {
                     Button exitPauseMenuButton = new Button("Exit Pause Menu");
                     Button changeVolumeButton = new Button("Change Volume");
                     Button restartGameButton = new Button("Restart Game");
+                    Button saveAndExitButton = new Button("Save And Exit");
                     Button quitGameButton = new Button("Quit Game");
-                    pauseMenu.getChildren().addAll(exitPauseMenuButton, changeVolumeButton, restartGameButton, quitGameButton);
-                    Scene pauseMenuScene = new Scene(pauseMenu, 300, 200);
+                    pauseMenu.getChildren().addAll(exitPauseMenuButton, changeVolumeButton, restartGameButton, saveAndExitButton, quitGameButton);
+                    Scene pauseMenuScene = new Scene(pauseMenu, 300, 250);
                     Stage pauseMenuStage = new Stage();
                     pauseMenuStage.setScene(pauseMenuScene);
                     pauseMenuStage.setTitle("Pause Menu");
@@ -114,6 +115,11 @@ public class App extends Application {
                     });
                     restartGameButton.setOnAction(event -> {
                         // Implement game restarting functionality
+                    });
+                    saveAndExitButton.setOnAction(event -> {
+                        // Save functionality here
+                        pauseMenuStage.close();
+                        showHomePage();
                     });
                     quitGameButton.setOnAction(event -> {
                         Alert confirmQuitAlert = new Alert(Alert.AlertType.CONFIRMATION);
