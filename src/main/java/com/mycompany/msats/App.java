@@ -120,7 +120,7 @@ public class App extends Application {
         root.getChildren().addAll(titleLabel, playGameButton, scoresButton, settingsButton, exitButton);
 
         playGameButton.setOnAction(event -> {
-            int currentScore;
+            int currentScore = 0;
             root.getChildren().clear();
             Label gameLabel = new Label("Game Screen Yippee :3");
             BorderPane.setAlignment(gameLabel, Pos.CENTER);
