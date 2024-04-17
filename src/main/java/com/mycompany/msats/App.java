@@ -26,6 +26,7 @@ import javafx.stage.Stage;
 
 public class App extends Application {
     private Stage stage;
+    private Database db;
 
     @Override
     public void start(Stage stage) {
@@ -65,6 +66,10 @@ public class App extends Application {
         });
         
         // Add create account button logic
+        createAccountButton.setOnAction(event -> {
+            db.saveUser(usernameField.getText(), passwordField.getText());
+            showHomePage();
+        });
 
         Scene scene = new Scene(root, 640, 480);
         stage.setScene(scene);
