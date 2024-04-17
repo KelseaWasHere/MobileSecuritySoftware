@@ -31,11 +31,65 @@ import java.sql.SQLException;
 public class App extends Application {
     private Stage stage;
     private Database db;
+    private String url = "jdbc:mysql://sql5.freesqldatabase.com:3306/sql5699628";
+    private String DB_username = "sql5699628";
+    private String DB_password = "B395ypbazU";
+    private int user_id;
+    private String User_username = "";
+    private String User_password = "";
+    private String query = "";
 
     @Override
     public void start(Stage stage) {
         this.stage = stage;
+        
+        try {
+            // Register JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            // Open a connection
+            Connection conn = DriverManager.getConnection(url, DB_username, DB_password);
+            // Connection successful
+            System.out.println("Connected to the database.");
+
+            // Perform database operations here
+
+            // Close the connection
+            conn.close();
+        } catch (SQLException e) {
+            // Handle SQL exceptions
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // Handle class not found exception
+            e.printStackTrace();
+        }
+        
         showLoginScreen();
+    }
+    
+    private String selectQuery(String selection) {
+        switch (selection) {
+            case "LogIn": 
+                query = "";
+                break;
+            case "GetUserID":
+                query = "";
+                break;
+            case "CreateAccount":
+                query = "";
+                break;
+            case "GetScoresUser":
+                query = "SELECT * FROM scores WHERE USER_ID = " + user_id;
+                break;
+            case "GetScoresGlobal":
+                query = "SELECT * FROM SCORE";
+                break;
+            case "SaveScore":
+                query = "";
+                break;
+            default:
+                break;
+        }
+        return query;
     }
 
     private void showLoginScreen() {
@@ -261,30 +315,6 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        String url = "jdbc:mysql://sql5.freesqldatabase.com:3306/sql5699628";
-        
-        String username = "sql5699628";
-        String password = "B395ypbazU";
-        
-        try {
-            // Register JDBC driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            // Open a connection
-            Connection conn = DriverManager.getConnection(url, username, password);
-            // Connection successful
-            System.out.println("Connected to the database.");
-
-            // Perform database operations here
-
-            // Close the connection
-            conn.close();
-        } catch (SQLException e) {
-            // Handle SQL exceptions
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // Handle class not found exception
-            e.printStackTrace();
-        }
         launch();
     }
 }
