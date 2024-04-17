@@ -26,158 +26,17 @@ import javafx.stage.Stage;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 
 public class App extends Application {
     private Stage stage;
-    private Database db;
-    private String url = "jdbc:mysql://sql5.freesqldatabase.com:3306/sql5699628";
-    private String DB_username = "sql5699628";
-    private String DB_password = "B395ypbazU";
-    private int user_id;
-    private String User_username = "";
-    private String User_password = "";
-    private String query = "";
+    private Database db = new Database();
 
     @Override
     public void start(Stage stage) {
         this.stage = stage;
-        
-        try {
-            // Register JDBC driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            // Open a connection
-            Connection conn = DriverManager.getConnection(url, DB_username, DB_password);
-            // Connection successful
-            System.out.println("Connected to the database.");
-
-            // Perform database operations here
-
-            // Close the connection
-            conn.close();
-        } catch (SQLException e) {
-            // Handle SQL exceptions
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // Handle class not found exception
-            e.printStackTrace();
-        }
-        
         showLoginScreen();
     }
-    
-    public boolean loginUser(String username, String password) {
-        try (Connection conn = DriverManager.getConnection(url, DB_username, DB_password)) {
-            String query = selectQuery("LogIn");
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
-            ResultSet rs = pstmt.executeQuery();
-            // If result set has at least one row, login successful
-            return rs.next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false; // Login failed due to an exception
-        }
-    }
-    
-    public int getUserId(String username) {
-        try (Connection conn = DriverManager.getConnection(url, DB_username, DB_password)) {
-            String query = selectQuery("GetUserID");
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("USER_ID");
-            } else {
-                return -1; // User not found
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return -1; // Error occurred while retrieving user ID
-        }
-    }
-    
-    public boolean createUser(String username, String password) {
-        try (Connection conn = DriverManager.getConnection(url, DB_username, DB_password)) {
-            String query = selectQuery("CreateAccount");
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0; // User creation successful if at least one row was affected
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false; // User creation failed due to an exception
-        }
-    }
-    
-    public ResultSet getUserScores(int userId) {
-        try (Connection conn = DriverManager.getConnection(url, DB_username, DB_password)) {
-            String query = selectQuery("GetScoresUser");
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setInt(1, userId);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null; // Error occurred while retrieving user scores
-        }
-    }
-    
-    public ResultSet getGlobalScores() {
-        try (Connection conn = DriverManager.getConnection(url, DB_username, DB_password)) {
-            String query = selectQuery("GetScoresGlobal");
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            return pstmt.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null; // Error occurred while retrieving global scores
-        }
-    }
-    
-    public boolean saveScore(int userId, int score) {
-        try (Connection conn = DriverManager.getConnection(url, DB_username, DB_password)) {
-            String query = selectQuery("SaveScore");
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setInt(1, userId);
-            pstmt.setInt(2, score);
-            pstmt.setDate(3, new java.sql.Date(System.currentTimeMillis())); // Assuming DATE column is of type DATE
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0; // Score saved successfully if at least one row was affected
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false; // Score saving failed due to an exception
-        }
-    }
-    
-    private String selectQuery(String selection) {
-        switch (selection) {
-            case "LogIn": 
-            query = "SELECT * FROM USERS WHERE USER_NAME = ? AND USER_PASS = ?";
-            break;
-        case "GetUserID":
-            query = "SELECT USER_ID FROM USERS WHERE USER_NAME = ?";
-            break;
-        case "CreateAccount":
-            query = "INSERT INTO USERS (USER_NAME, USER_PASS) VALUES (?, ?)";
-            break;
-        case "GetScoresUser":
-            query = "SELECT * FROM SCORE WHERE USER_ID = ?";
-            break;
-        case "GetScoresGlobal":
-            query = "SELECT * FROM SCORE ORDER BY SCORE DESC LIMIT 10";
-            break;
-        case "SaveScore":
-            query = "INSERT INTO scores (USER_ID, SCORE, DATE) VALUES (?, ?, ?)";
-            break;
-        default:
-            break;
-        }
-        return query;
-    }
-    
 
     private void showLoginScreen() {
         Label welcomeLabel = new Label("Welcome to Mobile Security Awareness Training!");
@@ -402,6 +261,30 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        String url = "jdbc:mysql://sql5.freesqldatabase.com:3306/sql5699628";
+        
+        String username = "sql5699628";
+        String password = "B395ypbazU";
+        
+        try {
+            // Register JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            // Open a connection
+            Connection conn = DriverManager.getConnection(url, username, password);
+            // Connection successful
+            System.out.println("Connected to the database.");
+
+            // Perform database operations here
+
+            // Close the connection
+            conn.close();
+        } catch (SQLException e) {
+            // Handle SQL exceptions
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // Handle class not found exception
+            e.printStackTrace();
+        }
         launch();
     }
 }
