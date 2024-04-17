@@ -1,9 +1,11 @@
-/**
- * Make database java class to check and save data.
- */
+package com.mycompany.msats;
 
 import java.sql.*;
 import java.util.ArrayList;
+
+/*
+ * Make database java class to check and save data.
+ */
 
 public class Database
 {
