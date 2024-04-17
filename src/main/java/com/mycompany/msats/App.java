@@ -23,6 +23,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 
 public class App extends Application {
     private Stage stage;
@@ -257,6 +261,30 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        String url = "jdbc:mysql://localhost:3306/sql5699628";
+        
+        String username = "sql5699628";
+        String password = "B395ypbazU";
+        
+        try {
+            // Register JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            // Open a connection
+            Connection conn = DriverManager.getConnection(url, username, password);
+            // Connection successful
+            System.out.println("Connected to the database.");
+
+            // Perform database operations here
+
+            // Close the connection
+            conn.close();
+        } catch (SQLException e) {
+            // Handle SQL exceptions
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // Handle class not found exception
+            e.printStackTrace();
+        }
         launch();
     }
 }
