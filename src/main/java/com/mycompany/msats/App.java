@@ -33,10 +33,13 @@ public class App extends Application {
     private Database db = new Database();
     private boolean isAdmin = false;
     private int userID;
+    private float volume;
+    
 
     @Override
     public void start(Stage stage) {
         this.stage = stage;
+        volume = 50;
         showLoginScreen();
     }
 
@@ -148,7 +151,26 @@ public class App extends Application {
                         pauseMenuStage.close();
                     });
                     changeVolumeButton.setOnAction(event -> {
-                        // Implement volume changing functionality, bring slider back from settings 
+                        Stage volumeStage = new Stage();
+                        volumeStage.setTitle("Volume");
+                        GridPane volumeGrid = new GridPane();
+                        volumeGrid.setPadding(new Insets(10));
+                        volumeGrid.setVgap(10);
+                        volumeGrid.setHgap(10);
+                        volumeGrid.setAlignment(Pos.CENTER);
+                        Slider volumeSlider = new Slider(0, 100, volume);
+                        Label volumeLabel = new Label("Volume:");
+                        Label volumeValueLabel = new Label();
+                        volumeGrid.add(volumeLabel, 0, 2);
+                        volumeGrid.add(volumeSlider, 1, 2);
+                        volumeGrid.add(volumeValueLabel, 2, 2);
+                        volumeValueLabel.setText(String.format("%.0f", volume));
+                        volumeSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
+                            volumeValueLabel.setText(String.format("%.0f", newValue));
+                        });
+                        Scene settingsScene = new Scene(volumeGrid, 350, 150);
+                        volumeStage.setScene(settingsScene);
+                        volumeStage.show();
                     });
                     restartGameButton.setOnAction(event -> {
                         // Implement game restarting functionality
@@ -185,7 +207,7 @@ public class App extends Application {
             Button yourScoresButton = new Button("Your Scores");
             Button globalLeaderboardButton = new Button("Global Leaderboard");
             Button backButton = new Button("Back");
-            yourScoresButton.setOnAction(new EventHandler<ActionEvent>() {
+            yourScoresButton.setOnAction(new EventHandler<ActionEvent>() { ///////////////////////////////////////Implement getting scores using database function
                 @Override
                 public void handle(ActionEvent e) {
                     root.getChildren().clear();
@@ -203,9 +225,9 @@ public class App extends Application {
                     root.getChildren().addAll(scoresBox, backButtonScores);
                 }
             });
-            globalLeaderboardButton.setOnAction(new EventHandler<ActionEvent>() {
+            globalLeaderboardButton.setOnAction(new EventHandler<ActionEvent>() { ///////////////////////////////////////Implement getting scores using database function
                 @Override
-                public void handle(ActionEvent e) {
+                public void handle(ActionEvent e) { 
                     root.getChildren().clear();
                     VBox leaderboardBox = new VBox(10);
                     leaderboardBox.setPadding(new Insets(10));
@@ -242,7 +264,7 @@ public class App extends Application {
             settingsGrid.setAlignment(Pos.CENTER);
             Label settingsLabel = new Label("Settings");
             CheckBox notificationsCheckBox = new CheckBox("Enable Notifications");
-            Slider volumeSlider = new Slider(0, 100, 50);
+            Slider volumeSlider = new Slider(0, 100, volume);
             Label volumeLabel = new Label("Volume:");
             Label volumeValueLabel = new Label();
             Button changePasswordButton = new Button("Change Password");
@@ -254,6 +276,7 @@ public class App extends Application {
             settingsGrid.add(volumeValueLabel, 2, 2);
             settingsGrid.add(changePasswordButton, 0, 3);
             settingsGrid.add(privacySettingsButton, 1, 3);
+            volumeValueLabel.setText(String.format("%.0f", volume));
             volumeSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
                 volumeValueLabel.setText(String.format("%.0f", newValue));
             });
