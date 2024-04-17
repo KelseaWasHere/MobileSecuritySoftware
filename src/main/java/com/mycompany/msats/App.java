@@ -131,7 +131,8 @@ public class App extends Application {
                         confirmQuitAlert.getButtonTypes().setAll(quitButton, cancelButton);
                         Optional<ButtonType> result = confirmQuitAlert.showAndWait();
                         if (result.isPresent() && result.get() == quitButton) {
-                            stage.close();
+                            pauseMenuStage.close();
+							stage.close();
                         }
                     });
                 }
