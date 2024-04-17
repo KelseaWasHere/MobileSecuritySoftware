@@ -30,7 +30,7 @@ import java.sql.SQLException;
 
 public class App extends Application {
     private Stage stage;
-    private Database db;
+    private Database db = new Database();
 
     @Override
     public void start(Stage stage) {
