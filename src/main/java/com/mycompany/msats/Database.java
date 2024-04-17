@@ -150,6 +150,61 @@ public class Database
 
         return false;
     }
+    
+    /**
+     * Get userID based on Username
+     * @param username
+     * @return
+     */
+    public int getUserId(String username) {
+        String q = "SELECT USER_ID FROM USERS WHERE USER_NAME = ?";
+    try {
+        PreparedStatement stmt = con.prepareStatement(q);
+        stmt.setString(1, username);
+        ResultSet resultSet = stmt.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt("USER_ID");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return -1; // Return -1 if user not found or error occurred
+    }
+    
+    /**
+     * Change the user password
+     * @param userID
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     */
+    public boolean changePassword(int userID, String oldPassword, String newPassword)
+    {
+        try
+    {
+        String q = "SELECT * FROM USERS WHERE USER_ID = '" + userID + "' AND USER_PASS = '" + oldPassword + "'";
+        ResultSet resultSet = stmt.executeQuery(q);
+
+        if (resultSet.next()) {
+            String updateQuery = "UPDATE USERS SET USER_PASS = '" + newPassword + "' WHERE USER_ID = '" + userID + "'";
+            int rowsUpdated = stmt.executeUpdate(updateQuery);
+
+            if (rowsUpdated > 0) {
+                return true; // Password changed successfully
+            } else {
+                return false; // Password update failed
+            }
+        } else {
+            // User does not exist or old password is incorrect
+            return false;
+        }
+    }
+    catch (Exception e)
+    {
+        e.printStackTrace();
+    }
+    return false; // Password change failed due to exception
+    }
 
     /**
      * Check if the username and password for admin user exists.

@@ -32,6 +32,7 @@ public class App extends Application {
     private Stage stage;
     private Database db = new Database();
     private boolean isAdmin = false;
+    private int userID;
 
     @Override
     public void start(Stage stage) {
@@ -71,11 +72,13 @@ public class App extends Application {
             {
                 // Is an admin
                 isAdmin = true;
+                userID = db.getUserId(usernameField.getText());
                 showHomePage();
             }
             else if(db.checkUserAccount(usernameField.getText(), passwordField.getText()))
             {
                 // Is a user
+                userID = db.getUserId(usernameField.getText());
                 showHomePage();
             }
             else
@@ -254,7 +257,48 @@ public class App extends Application {
                 volumeValueLabel.setText(String.format("%.0f", newValue));
             });
             changePasswordButton.setOnAction(e -> {
-                // Implement change password functionality
+                Stage changePasswordStage = new Stage();
+                changePasswordStage.setTitle("Change Password");
+                GridPane changePasswordGrid = new GridPane();
+                changePasswordGrid.setPadding(new Insets(10));
+                changePasswordGrid.setVgap(10);
+                changePasswordGrid.setHgap(10);
+                changePasswordGrid.setAlignment(Pos.CENTER);
+                Label oldPasswordLabel = new Label("Old Password:");
+                Label newPasswordLabel = new Label("New Password:");
+                TextField oldPasswordTextField = new TextField();
+                TextField newPasswordTextField = new TextField();
+                Button changeButton = new Button("Change Password");
+                Button closeButton = new Button("Close");
+                changePasswordGrid.add(oldPasswordLabel, 0, 0);
+                changePasswordGrid.add(oldPasswordTextField, 1, 0);
+                changePasswordGrid.add(newPasswordLabel, 0, 1);
+                changePasswordGrid.add(newPasswordTextField, 1, 1);
+                changePasswordGrid.add(changeButton, 0, 2);
+                changePasswordGrid.add(closeButton, 1, 2);
+                changeButton.setOnAction(e1 -> {
+                    String oldPassword = oldPasswordTextField.getText();
+                    String newPassword = newPasswordTextField.getText();
+                    boolean passwordChanged = db.changePassword(userID, oldPassword, newPassword);
+                    if (passwordChanged) {
+                        Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                        successAlert.setTitle("Password Changed");
+                        successAlert.setHeaderText(null);
+                        successAlert.setContentText("Your password has been successfully changed.");
+                        successAlert.showAndWait();
+                        changePasswordStage.close();
+                    } else {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                        errorAlert.setTitle("Password Change Failed");
+                        errorAlert.setHeaderText(null);
+                        errorAlert.setContentText("Failed to change password. Please check your old password.");
+                        errorAlert.showAndWait();
+                    }
+                });
+                closeButton.setOnAction(e1 -> changePasswordStage.close());
+                Scene changePasswordScene = new Scene(changePasswordGrid, 350, 150);
+                changePasswordStage.setScene(changePasswordScene);
+                changePasswordStage.show();
             });
             privacySettingsButton.setOnAction(e -> {
                 // Implement privacy settings functionality
