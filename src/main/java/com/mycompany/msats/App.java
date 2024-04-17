@@ -31,6 +31,7 @@ import java.sql.SQLException;
 public class App extends Application {
     private Stage stage;
     private Database db = new Database();
+    private boolean isAdmin = false;
 
     @Override
     public void start(Stage stage) {
@@ -66,13 +67,36 @@ public class App extends Application {
 
         loginButton.setOnAction(event -> {
             // Call method to show homepage, add database stuff here
-            showHomePage();
+            if(db.checkAdminAccount(usernameField.getText(), passwordField.getText()))
+            {
+                // Is an admin
+                isAdmin = true;
+                showHomePage();
+            }
+            else if(db.checkUserAccount(usernameField.getText(), passwordField.getText()))
+            {
+                // Is a user
+                showHomePage();
+            }
+            else
+            {
+                loginLabel.setText("Invalid Login");
+            }
+            //showHomePage();
         });
         
-        // Add create account button logic
+        // Create account button logic
         createAccountButton.setOnAction(event -> {
-            db.saveUser(usernameField.getText(), passwordField.getText());
-            showHomePage();
+            // Check if user already exists
+            if(db.checkUserAccount(usernameField.getText(), passwordField.getText()) || db.checkAdminAccount(usernameField.getText(), passwordField.getText()))
+            {
+                loginLabel.setText("User Already Exists");
+            }
+            else
+            {
+                db.saveUser(usernameField.getText(), passwordField.getText());
+                showHomePage();
+            }
         });
 
         Scene scene = new Scene(root, 640, 480);
