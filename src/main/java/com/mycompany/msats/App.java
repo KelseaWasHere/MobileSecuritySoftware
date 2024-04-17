@@ -261,7 +261,7 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        String url = "jdbc:mysql://localhost:3306/sql5699628";
+        String url = "jdbc:mysql://sql5.freesqldatabase.com:3306/sql5699628";
         
         String username = "sql5699628";
         String password = "B395ypbazU";
