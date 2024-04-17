@@ -2,6 +2,8 @@ package com.mycompany.msats;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;  
+import java.time.LocalDateTime;    
 
 /*
  * Make database java class to check and save data.
@@ -96,6 +98,35 @@ public class Database
     {
 
         String q = "INSERT INTO USERS (USER_NAME, USER_PASS) VALUES('" + user + "', '" + pass + "')";
+        try
+        {
+            if (stmt.executeUpdate(q) > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    /**
+     * Save score to the database.
+     * @param userID
+     * @param score
+     * @return
+     */
+    public boolean saveScore(int userID, int score)
+    {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"); 
+        LocalDateTime date = LocalDateTime.now();
+        String q = "INSERT INTO SCORE (USER_ID, SCORE, DATE) VALUES('" + userID + "', '" + score + "',  '" + date + "')";
         try
         {
             if (stmt.executeUpdate(q) > 0)

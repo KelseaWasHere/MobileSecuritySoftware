@@ -120,6 +120,7 @@ public class App extends Application {
         root.getChildren().addAll(titleLabel, playGameButton, scoresButton, settingsButton, exitButton);
 
         playGameButton.setOnAction(event -> {
+            int currentScore;
             root.getChildren().clear();
             Label gameLabel = new Label("Game Screen Yippee :3");
             BorderPane.setAlignment(gameLabel, Pos.CENTER);
@@ -153,7 +154,7 @@ public class App extends Application {
                         // Implement game restarting functionality
                     });
                     saveAndExitButton.setOnAction(event -> {
-                        // Save functionality here
+                        db.saveScore(userID, currentScore);
                         pauseMenuStage.close();
                         showHomePage();
                     });
@@ -329,30 +330,6 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        String url = "jdbc:mysql://sql5.freesqldatabase.com:3306/sql5699628";
-        
-        String username = "sql5699628";
-        String password = "B395ypbazU";
-        
-        try {
-            // Register JDBC driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            // Open a connection
-            Connection conn = DriverManager.getConnection(url, username, password);
-            // Connection successful
-            System.out.println("Connected to the database.");
-
-            // Perform database operations here
-
-            // Close the connection
-            conn.close();
-        } catch (SQLException e) {
-            // Handle SQL exceptions
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // Handle class not found exception
-            e.printStackTrace();
-        }
         launch();
     }
 }
