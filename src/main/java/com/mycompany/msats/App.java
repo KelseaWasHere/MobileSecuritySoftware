@@ -132,7 +132,7 @@ public class App extends Application {
                         Optional<ButtonType> result = confirmQuitAlert.showAndWait();
                         if (result.isPresent() && result.get() == quitButton) {
                             pauseMenuStage.close();
-							stage.close();
+                            stage.close();
                         }
                     });
                 }
