@@ -26,7 +26,8 @@ import javafx.stage.Stage;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 
 public class App extends Application {
     private Stage stage;
@@ -34,6 +35,38 @@ public class App extends Application {
     private boolean isAdmin = false;
     private int userID;
     private float volume;
+    private int question_number = 0;
+    private int miss_number = 0;
+    
+    public int getMNum(){
+        return miss_number;
+    }
+    public void increaseMNum(){
+        if (miss_number<3){
+        miss_number++;
+        }
+        else{
+        miss_number = 0;
+        }
+    }
+    public void resetMNum(){
+        miss_number = 0;
+    }  
+    public int getQNum(){
+        return question_number;
+    }
+    public void increaseQNum(){
+        if (question_number<14){
+        question_number++;
+        }
+        else{
+        question_number = 0;
+        }
+    }
+    public void resetQNum(){
+        question_number = 0;
+    }    
+    
     
 
     @Override
@@ -42,7 +75,7 @@ public class App extends Application {
         volume = 50;
         showLoginScreen();
     }
-
+    
     private void showLoginScreen() {
         Label welcomeLabel = new Label("Welcome to Mobile Security Awareness Training!");
         Label loginLabel = new Label("Login or Create Account");
@@ -121,86 +154,177 @@ public class App extends Application {
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
         root.getChildren().addAll(titleLabel, playGameButton, scoresButton, settingsButton, exitButton);
-
         playGameButton.setOnAction(event -> {
-            int currentScore = 0;
-            root.getChildren().clear();
-            Label gameLabel = new Label("Game Screen Yippee :3");
-            BorderPane.setAlignment(gameLabel, Pos.CENTER);
-            Button pauseButton = new Button("Pause");
-            BorderPane.setAlignment(pauseButton, Pos.TOP_LEFT);
-            BorderPane.setMargin(pauseButton, new Insets(10));
-            pauseButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent e) {
-                    VBox pauseMenu = new VBox(10);
-                    pauseMenu.setPadding(new Insets(20));
-                    pauseMenu.setAlignment(Pos.CENTER);
-                    Button exitPauseMenuButton = new Button("Exit Pause Menu");
-                    Button changeVolumeButton = new Button("Change Volume");
-                    Button restartGameButton = new Button("Restart Game");
-                    Button saveAndExitButton = new Button("Save And Exit");
-                    Button quitGameButton = new Button("Quit Game");
-                    pauseMenu.getChildren().addAll(exitPauseMenuButton, changeVolumeButton, restartGameButton, saveAndExitButton, quitGameButton);
-                    Scene pauseMenuScene = new Scene(pauseMenu, 300, 250);
-                    Stage pauseMenuStage = new Stage();
-                    pauseMenuStage.setScene(pauseMenuScene);
-                    pauseMenuStage.setTitle("Pause Menu");
-                    pauseMenuStage.show();
-                    exitPauseMenuButton.setOnAction(event -> {
+        
+        int currentScore = 0;
+        root.getChildren().clear();
+        Label gameLabel = new Label("Mobile Security Trivia");
+        BorderPane.setAlignment(gameLabel, Pos.TOP_CENTER);
+        Button pauseButton = new Button("Pause");
+        BorderPane.setAlignment(pauseButton, Pos.TOP_LEFT);
+        BorderPane.setMargin(pauseButton, new Insets(10));
+        pauseButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                VBox pauseMenu = new VBox(10);
+                pauseMenu.setPadding(new Insets(20));
+                pauseMenu.setAlignment(Pos.CENTER);
+                Button exitPauseMenuButton = new Button("Exit Pause Menu");
+                Button changeVolumeButton = new Button("Change Volume");
+                Button restartGameButton = new Button("Restart Game");
+                Button saveAndExitButton = new Button("Save And Exit");
+                Button quitGameButton = new Button("Quit Game");
+                pauseMenu.getChildren().addAll(exitPauseMenuButton, changeVolumeButton, restartGameButton, saveAndExitButton, quitGameButton);
+                Scene pauseMenuScene = new Scene(pauseMenu, 300, 250);
+                Stage pauseMenuStage = new Stage();
+                pauseMenuStage.setScene(pauseMenuScene);
+                pauseMenuStage.setTitle("Pause Menu");
+                pauseMenuStage.show();
+                exitPauseMenuButton.setOnAction(event -> {
+                    pauseMenuStage.close();
+                });
+                changeVolumeButton.setOnAction(event -> {
+                    Stage volumeStage = new Stage();
+                    volumeStage.setTitle("Volume");
+                    GridPane volumeGrid = new GridPane();
+                    volumeGrid.setPadding(new Insets(10));
+                    volumeGrid.setVgap(10);
+                    volumeGrid.setHgap(10);
+                    volumeGrid.setAlignment(Pos.CENTER);
+                    Slider volumeSlider = new Slider(0, 100, volume);
+                    Label volumeLabel = new Label("Volume:");
+                    Label volumeValueLabel = new Label();
+                    volumeGrid.add(volumeLabel, 0, 2);
+                    volumeGrid.add(volumeSlider, 1, 2);
+                    volumeGrid.add(volumeValueLabel, 2, 2);
+                    volumeValueLabel.setText(String.format("%.0f", volume));
+                    volumeSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
+                        volumeValueLabel.setText(String.format("%.0f", newValue));
+                    });
+                    Scene settingsScene = new Scene(volumeGrid, 350, 150);
+                    volumeStage.setScene(settingsScene);
+                    volumeStage.show();
+                });
+                restartGameButton.setOnAction(event -> {
+                    // Implement game restarting functionality
+                });
+                saveAndExitButton.setOnAction(event -> {
+                    db.saveScore(userID, currentScore);
+                    pauseMenuStage.close();
+                    showHomePage();
+                });
+                quitGameButton.setOnAction(event -> {
+                    Alert confirmQuitAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmQuitAlert.setTitle("Confirm Quit");
+                    confirmQuitAlert.setHeaderText(null);
+                    confirmQuitAlert.setContentText("Are you sure you want to quit the game?");
+                    ButtonType quitButton = new ButtonType("Quit", ButtonBar.ButtonData.OK_DONE);
+                    ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+                    confirmQuitAlert.getButtonTypes().setAll(quitButton, cancelButton);
+                    Optional<ButtonType> result = confirmQuitAlert.showAndWait();
+                    if (result.isPresent() && result.get() == quitButton) {
                         pauseMenuStage.close();
-                    });
-                    changeVolumeButton.setOnAction(event -> {
-                        Stage volumeStage = new Stage();
-                        volumeStage.setTitle("Volume");
-                        GridPane volumeGrid = new GridPane();
-                        volumeGrid.setPadding(new Insets(10));
-                        volumeGrid.setVgap(10);
-                        volumeGrid.setHgap(10);
-                        volumeGrid.setAlignment(Pos.CENTER);
-                        Slider volumeSlider = new Slider(0, 100, volume);
-                        Label volumeLabel = new Label("Volume:");
-                        Label volumeValueLabel = new Label();
-                        volumeGrid.add(volumeLabel, 0, 2);
-                        volumeGrid.add(volumeSlider, 1, 2);
-                        volumeGrid.add(volumeValueLabel, 2, 2);
-                        volumeValueLabel.setText(String.format("%.0f", volume));
-                        volumeSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
-                            volumeValueLabel.setText(String.format("%.0f", newValue));
-                        });
-                        Scene settingsScene = new Scene(volumeGrid, 350, 150);
-                        volumeStage.setScene(settingsScene);
-                        volumeStage.show();
-                    });
-                    restartGameButton.setOnAction(event -> {
-                        // Implement game restarting functionality
-                    });
-                    saveAndExitButton.setOnAction(event -> {
-                        db.saveScore(userID, currentScore);
-                        pauseMenuStage.close();
-                        showHomePage();
-                    });
-                    quitGameButton.setOnAction(event -> {
-                        Alert confirmQuitAlert = new Alert(Alert.AlertType.CONFIRMATION);
-                        confirmQuitAlert.setTitle("Confirm Quit");
-                        confirmQuitAlert.setHeaderText(null);
-                        confirmQuitAlert.setContentText("Are you sure you want to quit the game?");
-                        ButtonType quitButton = new ButtonType("Quit", ButtonBar.ButtonData.OK_DONE);
-                        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-                        confirmQuitAlert.getButtonTypes().setAll(quitButton, cancelButton);
-                        Optional<ButtonType> result = confirmQuitAlert.showAndWait();
-                        if (result.isPresent() && result.get() == quitButton) {
-                            pauseMenuStage.close();
-                            stage.close();
-                        }
-                    });
-                }
-            });
-            BorderPane gamePane = new BorderPane();
-            gamePane.setCenter(gameLabel);
-            gamePane.setTop(pauseButton);
-            root.getChildren().add(gamePane);
+                        stage.close();
+                    }
+                });
+            }
         });
+        
+
+            String current_question = Questions.questions[getQNum()];
+            String option_string = Questions.options[getQNum()];
+            String correct_answer = Questions.correctAnswers[getQNum()];
+
+            String []options_array = option_string.split("\n",4);
+
+            Label question_count = new Label("Question "+(getQNum()+1)+" of 15");
+
+            Label strike_count = new Label("Number of Strikes: "+getMNum());
+
+            Label error_label = new Label("");
+
+            Label question = new Label(current_question);
+
+            RadioButton op1 = new RadioButton(options_array[0]);
+            RadioButton op2 = new RadioButton(options_array[1]);
+            RadioButton op3 = new RadioButton(options_array[2]);
+            RadioButton op4 = new RadioButton(options_array[3]);
+
+            ToggleGroup tg = new ToggleGroup(); 
+            op1.setToggleGroup(tg);
+            op2.setToggleGroup(tg);
+            op3.setToggleGroup(tg);
+            op4.setToggleGroup(tg);
+
+            Button submitBtn = new Button("Submit Answer");
+         
+
+            submitBtn.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent t) {
+                    String correct_answer = Questions.correctAnswers[getQNum()];
+                    RadioButton rb = (RadioButton)tg.getSelectedToggle();
+                    if(rb==null){
+                       error_label.setText("You must enter a correct answer!!!");
+                    }
+                    else if (rb.getText().equals(correct_answer)){
+                        increaseQNum();
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Great job!");
+                        alert.setHeaderText(null);
+                        alert.setContentText("That is the correct answer!");
+                        alert.show();
+                    }
+                    else{
+                        increaseMNum();
+                        increaseQNum();
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Incorrect!");
+                        alert.setHeaderText(null);
+                        alert.setContentText("That is the wrong answer! The right answer was: "+correct_answer+". You just gained a Strike!");
+                        alert.show();
+                    }
+                    
+                    
+                    String current_question = Questions.questions[getQNum()];
+                    String option_string = Questions.options[getQNum()];
+       
+
+                    String []options_array = option_string.split("\n",4);
+
+                    Label question_count = new Label("Question "+(getQNum()+1)+" of 15");
+
+                    Label strike_count = new Label("Number of Strikes: "+getMNum());
+
+                    Label error_label = new Label("");
+
+                    Label question = new Label(current_question);
+
+                    RadioButton op1 = new RadioButton(options_array[0]);
+                    RadioButton op2 = new RadioButton(options_array[1]);
+                    RadioButton op3 = new RadioButton(options_array[2]);
+                    RadioButton op4 = new RadioButton(options_array[3]);
+
+                    op1.setToggleGroup(tg);
+                    op2.setToggleGroup(tg);
+                    op3.setToggleGroup(tg);
+                    op4.setToggleGroup(tg);
+                    root.getChildren().set(1,question_count);
+                    root.getChildren().set(2,strike_count);
+                    root.getChildren().set(3,error_label);
+                    root.getChildren().set(4,question);
+                    root.getChildren().set(5,op1);
+                    root.getChildren().set(6,op2);
+                    root.getChildren().set(7,op3);
+                    root.getChildren().set(8,op4);
+                };
+            });
+
+        root.getChildren().addAll(pauseButton, question_count,strike_count, error_label, question, op1, op2, op3, op4,submitBtn);         
+            
+        });
+        
+        
 
         scoresButton.setOnAction(event -> {
             root.getChildren().clear();
