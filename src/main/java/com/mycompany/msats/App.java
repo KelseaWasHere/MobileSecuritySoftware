@@ -104,7 +104,12 @@ public class App extends Application {
 
         loginButton.setOnAction(event -> {
             // Call method to show homepage, add database stuff here
-            if(db.checkAdminAccount(usernameField.getText(), passwordField.getText()))
+            if (usernameField.getText() == null || usernameField.getText().trim().isEmpty() || passwordField.getText() == null || passwordField.getText().trim().isEmpty())
+            {
+                // Checks if it's empty.
+                loginLabel.setText("Username and/or Password Empty, try again");
+            }
+            else if(db.checkAdminAccount(usernameField.getText(), passwordField.getText()))
             {
                 // Is an admin
                 isAdmin = true;
@@ -119,7 +124,7 @@ public class App extends Application {
             }
             else
             {
-                loginLabel.setText("Invalid Login");
+                loginLabel.setText("Invalid Login, try again");
             }
             //showHomePage();
         });
@@ -127,14 +132,28 @@ public class App extends Application {
         // Create account button logic
         createAccountButton.setOnAction(event -> {
             // Check if user already exists
-            if(db.checkUserAccount(usernameField.getText(), passwordField.getText()) || db.checkAdminAccount(usernameField.getText(), passwordField.getText()))
+            if (usernameField.getText() == null || usernameField.getText().trim().isEmpty() || passwordField.getText() == null || passwordField.getText().trim().isEmpty())
+            {
+                // Checks if it's empty.
+                loginLabel.setText("Username and/or Password Empty, try again");
+            }
+            else if(db.checkUserAccount(usernameField.getText(), passwordField.getText()) || db.checkAdminAccount(usernameField.getText(), passwordField.getText()))
             {
                 loginLabel.setText("User Already Exists");
             }
             else
             {
-                db.saveUser(usernameField.getText(), passwordField.getText());
-                showHomePage();
+                // Check password if strong
+                if (db.validPassword(passwordField.getText()))
+                {
+                    db.saveUser(usernameField.getText(), passwordField.getText());
+                    showHomePage();
+                }
+                else
+                {
+                    loginLabel.setText("Password invalid, make stronger.");
+                }
+
             }
         });
 
@@ -290,7 +309,7 @@ public class App extends Application {
                     String option_string = Questions.options[getQNum()];
        
 
-                    String []options_array = option_string.split("\n",4);
+                    String[] options_array = option_string.split("\n",4);
 
                     Label question_count = new Label("Question "+(getQNum()+1)+" of 15");
 

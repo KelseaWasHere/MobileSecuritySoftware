@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;  
 import java.time.LocalDateTime;    
+import java.util.Arrays;
 
 /*
  * Make database java class to check and save data.
@@ -273,6 +274,55 @@ public class Database
 
         return false;
 
+    }
+    
+    /**
+     * Check if password is valid.
+     * @param pass
+     * @return 
+     */
+    public boolean validPassword(String pass)
+    {
+        // Return if password is smaller than 10
+        if (pass.length() < 10)
+        {
+            return false;
+        }
+        
+        // Preset values.
+        boolean hasLower = false, hasUpper = true, hasDigit = false, 
+                hasSpecialChar = false;
+        ArrayList<Character> specialChars =
+        new ArrayList<>(Arrays.asList('!', '@', '#', '$', '%', '^', '&',
+                '*', '(', ')', '-', '+'));
+        
+        for (char i : pass.toCharArray())
+        {
+            if (Character.isLowerCase(i))
+            {
+                hasLower = true;
+            }
+            if (Character.isUpperCase(i))
+            {
+                hasUpper = true;
+            }
+            if (Character.isDigit(i))
+            {
+                hasDigit = true;
+            }
+            if (specialChars.contains(i))
+            {
+                hasSpecialChar = true;
+            }
+        }
+        
+        // Return true when password is verified.
+        if (hasLower && hasUpper && hasDigit && hasSpecialChar)
+        {
+            return true;
+        }
+        
+        return false;
     }
 
 }
