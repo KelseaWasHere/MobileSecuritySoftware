@@ -50,43 +50,65 @@ public class Database
     }
 
     /**
-     * Get an arraylist of scores with the following data:
+     * Get an arraylist of scores with the following data based on a userID:
      * - Username
      * - Score
      * - Date achieved.
-     * @param max
+     * @param userID
      * @return
      */
-    public ArrayList<String> getRows(int max)
+    public ArrayList<String> getRows(int userID)
     {
-        String q1 = "SELECT COUNT(*) FROM SCORE";
-        int totalRows = 0;
+        ArrayList<String> rows = new ArrayList<>();
+        try {
+            String query = "SELECT USERS.USER_NAME, SCORE.SCORE, SCORE.DATE " +
+                           "FROM USERS " +
+                           "INNER JOIN SCORE ON USERS.USER_ID = SCORE.USER_ID " +
+                           "WHERE USERS.USER_ID = ?";
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setInt(1, userID);
+            ResultSet resultSet = statement.executeQuery();
 
-        ArrayList<String> rowData = new ArrayList<>();
-        try
-        {
-            if (stmt.executeUpdate(q1) > 0)
-            {
-                totalRows = stmt.getMaxRows();
-                if (totalRows < max)
-                {
-                    max = totalRows;
-                }
-
-                String q2 = "SELECT TOP " + max + " FROM SCORE";
-                ResultSet set = stmt.executeQuery(q2);
-
+            while (resultSet.next()) {
+                String username = resultSet.getString("USER_NAME");
+                int score = resultSet.getInt("SCORE");
+                String date = resultSet.getString("DATE");
+                String row = username + ", " + score + ", " + date;
+                rows.add(row);
             }
-            else
-            {
-            }
-        }
-        catch (Exception e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+        return rows;
+    }
+    
+    /**
+     * Get an arraylist of all scores with the following data:
+     * - Username
+     * - Score
+     * - Date achieved.
+     * @return
+     */
+    public ArrayList<String> getAllRows()
+    {
+        ArrayList<String> allRows = new ArrayList<>();
+        try {
+            String query = "SELECT USERS.USER_NAME, SCORE.SCORE, SCORE.DATE " +
+                           "FROM USERS " +
+                           "INNER JOIN SCORE ON USERS.USER_ID = SCORE.USER_ID";
+            ResultSet resultSet = stmt.executeQuery(query);
 
-        return rowData;
+            while (resultSet.next()) {
+                String username = resultSet.getString("USER_NAME");
+                int score = resultSet.getInt("SCORE");
+                String date = resultSet.getString("DATE");
+                String row = username + ", " + score + ", " + date;
+                allRows.add(row);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return allRows;
     }
 
     /**
@@ -127,7 +149,8 @@ public class Database
     {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"); 
         LocalDateTime date = LocalDateTime.now();
-        String q = "INSERT INTO SCORE (USER_ID, SCORE, DATE) VALUES('" + userID + "', '" + score + "',  '" + date + "')";
+        String formattedDate = dtf.format(date);
+        String q = "INSERT INTO SCORE (USER_ID, SCORE, DATE) VALUES('" + userID + "', '" + score + "',  '" + formattedDate + "')";
         try
         {
             if (stmt.executeUpdate(q) > 0)
