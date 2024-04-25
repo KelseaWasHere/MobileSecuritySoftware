@@ -316,6 +316,14 @@ public class App extends Application {
                         alert.setHeaderText(null);
                         alert.setContentText("That is the wrong answer! The right answer was: "+correct_answer+". You just gained a Strike!");
                         alert.show();
+                        if (getMNum() >= 3) {
+                            Alert gameOver = new Alert(Alert.AlertType.CONFIRMATION);
+                            gameOver.setTitle("Game Over!");
+                            gameOver.setHeaderText(null);
+                            gameOver.setContentText("3 Strikes and you're out! Your score was: " + getSNum());
+                            gameOver.show();
+                            showHomePage();
+                        }
                     }
 
 
