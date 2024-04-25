@@ -175,6 +175,7 @@ public class App extends Application {
     }
 
     private void showHomePage() {
+        resetSNum();
         Label titleLabel = new Label("Mobile Security Awareness Training Software");
         Button playGameButton = new Button("Play Game");
         Button scoresButton = new Button("Your Scores/Global Leaderboard");
@@ -317,6 +318,7 @@ public class App extends Application {
                         alert.setContentText("That is the wrong answer! The right answer was: "+correct_answer+". You just gained a Strike!");
                         alert.show();
                         if (getMNum() >= 3) {
+                            db.saveScore(userID, getSNum());
                             Alert gameOver = new Alert(Alert.AlertType.CONFIRMATION);
                             gameOver.setTitle("Game Over!");
                             gameOver.setHeaderText(null);
